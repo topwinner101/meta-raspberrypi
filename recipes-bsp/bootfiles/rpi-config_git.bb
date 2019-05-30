@@ -25,6 +25,9 @@ PITFT35r="${@bb.utils.contains("MACHINE_FEATURES", "pitft35r", "1", "0", d)}"
 VC4GRAPHICS="${@bb.utils.contains("MACHINE_FEATURES", "vc4graphics", "1", "0", d)}"
 VC4DTBO ?= "vc4-kms-v3d"
 
+ENABLE_UART  = "1"
+ENABLE_I2C   = "1"
+
 inherit deploy nopackages
 
 do_deploy() {
@@ -185,6 +188,8 @@ do_deploy() {
 
     # Append extra config if the user has provided any
     printf "${RPI_EXTRA_CONFIG}\n" >> ${DEPLOYDIR}/bcm2835-bootfiles/config.txt
+
+    echo "dtparam=uart0=on" >> ${DEPLOYDIR}/bcm2835-bootfiles/config.txt
 }
 
 do_deploy_append_raspberrypi3-64() {
