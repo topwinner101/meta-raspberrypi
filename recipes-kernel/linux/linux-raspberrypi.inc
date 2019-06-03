@@ -20,9 +20,12 @@ KBUILD_DEFCONFIG_raspberrypi2 ?= "bcm2709_defconfig"
 KBUILD_DEFCONFIG_raspberrypi3 ?= "bcm2709_defconfig"
 KBUILD_DEFCONFIG_raspberrypi3-64 ?= "bcmrpi3_defconfig"
 
+ENABLE_UART = "1"
+
 # CMDLINE for raspberrypi
-SERIAL = "${@oe.utils.conditional("ENABLE_UART", "1", "console=serial0,115200", "", d)}"
-CMDLINE ?= "dwc_otg.lpm_enable=0 ${SERIAL} root=/dev/mmcblk0p2 rootfstype=ext4 rootwait"
+ADD_CMD = "debug"
+SERIAL = "console=ttyS0,115200"
+CMDLINE ?= "dwc_otg.lpm_enable=0 ${SERIAL} root=/dev/mmcblk0p2 rootfstype=ext4 rootwait ${ADD_CMD}"
 
 # Add the kernel debugger over console kernel command line option if enabled
 CMDLINE_append = ' ${@oe.utils.conditional("ENABLE_KGDB", "1", "kgdboc=serial0,115200", "", d)}'
@@ -88,6 +91,7 @@ config_setup() {
     if [ -f "${WORKDIR}/defconfig" ] && [ ! -f "${B}/.config" ]; then
         cp "${WORKDIR}/defconfig" "${B}/.config"
     fi
+make  bcm2709_defconfig
 }
 
 do_configure_prepend() {
