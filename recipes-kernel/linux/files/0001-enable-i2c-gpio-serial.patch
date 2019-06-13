@@ -1,16 +1,15 @@
-From a54095568fe6dd1135f46f0ed7ae33ed97c285e6 Mon Sep 17 00:00:00 2001
+From ebfc4f48235ee6ad7fa71359b72ef3673d758672 Mon Sep 17 00:00:00 2001
 From: daniel_chan <daniel_chan@accton.com>
 Date: Fri, 31 May 2019 14:04:10 +0800
 Subject: [PATCH] enable i2c gpio serial.
 
 ---
- arch/arm/boot/dts/bcm2710-rpi-3-b-plus.dts | 43 +++++++++++++++++++++-
- arch/arm/configs/bcm2709_defconfig         | 21 +++++++----
- arch/arm64/configs/bcmrpi3_defconfig       | 17 ++++++---
- 3 files changed, 66 insertions(+), 15 deletions(-)
+ arch/arm/boot/dts/bcm2710-rpi-3-b-plus.dts | 40 +++++++++++++++++++++-
+ arch/arm/configs/bcm2709_defconfig         | 23 ++++++++-----
+ 2 files changed, 53 insertions(+), 10 deletions(-)
 
 diff --git a/arch/arm/boot/dts/bcm2710-rpi-3-b-plus.dts b/arch/arm/boot/dts/bcm2710-rpi-3-b-plus.dts
-index 59dd76c3240d..9d96b0ebf24d 100644
+index 59dd76c3240d..a923157d2aae 100644
 --- a/arch/arm/boot/dts/bcm2710-rpi-3-b-plus.dts
 +++ b/arch/arm/boot/dts/bcm2710-rpi-3-b-plus.dts
 @@ -19,6 +19,8 @@
@@ -27,26 +26,17 @@ index 59dd76c3240d..9d96b0ebf24d 100644
  	};
  
 +	i2sw_pins: i2sw {
-+		brcm,pins = <17>; /* i2c switch reset */
++		brcm,pins = <19>; /* i2c switch reset */
 +		brcm,function = <1>; /* output */
 +	};
 +
  	i2s_pins: i2s {
  		brcm,pins = <18 19 20 21>;
  		brcm,function = <4>; /* alt0 */
-@@ -72,6 +79,31 @@
+@@ -72,6 +79,28 @@
  		brcm,pins = <40 41>;
  		brcm,function = <4>;
  	};
-+	pwm0_gpio18: pwm0_gpio18 {
-+		brcm,pins = <18>;
-+		brcm,function = <2>;
-+	};
-+
-+	pwm1_gpio19: pwm1_gpio19 {
-+		brcm,pins = <19>;
-+		brcm,function = <2>;
-+	};
 +
 +	pwm0_gpio12: pwm0_gpio12 {
 +		brcm,pins = <12>;
@@ -61,12 +51,18 @@ index 59dd76c3240d..9d96b0ebf24d 100644
 +
 +&pwm {
 +	pinctrl-names = "default";
-+	pinctrl-0 = <&pwm0_gpio18 &pwm1_gpio19 &pwm0_gpio12 &pwm1_gpio13>;
++	pinctrl-0 = <&pwm0_gpio12 &pwm1_gpio13>;
 +	status = "okay";
++	gpio_fan {
++		status = "okay";
++		compatible = "gpio-fan";
++		gpios = <&gpio 20 0>, <&gpio 21 0>, <&gpio 16 0>,<&gpio 26 0>;
++		gpio-fan,speed-map = <0 0 3000 1>;
++	};
  };
  
  &mmc {
-@@ -135,8 +167,17 @@
+@@ -135,8 +164,17 @@
  
  &i2c1 {
  	pinctrl-names = "default";
@@ -80,13 +76,13 @@ index 59dd76c3240d..9d96b0ebf24d 100644
 +		#address-cells = <0x1>;
 +		#size-cells = <0x0>;
 +		reg = <0x75>;
-+		reset-gpios = <&gpio 25 1>; /* 0:in, 1:out */
++		reset-gpios = <&gpio 19 1>; /* 0:in, 1:out */
 +	};
  };
  
  &i2c2 {
 diff --git a/arch/arm/configs/bcm2709_defconfig b/arch/arm/configs/bcm2709_defconfig
-index a2db06f18290..3fcfc411c3ec 100644
+index a2db06f18290..b031e39a7681 100644
 --- a/arch/arm/configs/bcm2709_defconfig
 +++ b/arch/arm/configs/bcm2709_defconfig
 @@ -610,12 +610,14 @@ CONFIG_RAW_DRIVER=y
@@ -108,6 +104,15 @@ index a2db06f18290..3fcfc411c3ec 100644
  CONFIG_I2C_ROBOTFUZZ_OSIF=m
  CONFIG_I2C_TINY_USB=m
  CONFIG_SPI=y
+@@ -658,7 +660,7 @@ CONFIG_BATTERY_DS2760=m
+ CONFIG_BATTERY_GAUGE_LTC2941=m
+ CONFIG_HWMON=m
+ CONFIG_SENSORS_DS1621=m
+-CONFIG_SENSORS_GPIO_FAN=m
++CONFIG_SENSORS_GPIO_FAN=y
+ CONFIG_SENSORS_JC42=m
+ CONFIG_SENSORS_LM75=m
+ CONFIG_SENSORS_RPI_POE_FAN=m
 @@ -1014,7 +1016,8 @@ CONFIG_USBIP_VHCI_HCD=m
  CONFIG_USBIP_HOST=m
  CONFIG_USBIP_VUDC=m

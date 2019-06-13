@@ -12,6 +12,10 @@ IMAGE_INSTALL += " \
 	raspi-gpio \
 	i2c-tools \
 	iperf3 \
+       python \
+       python-modules \
+       python3 \
+       python3-modules \
 	"
 
 SPLASH = "psplash-raspberrypi"
